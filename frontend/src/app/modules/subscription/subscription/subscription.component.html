@@ -1,0 +1,106 @@
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-2xl font-bold text-gray-900 mb-8">Subscription Management</h1>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="text-center py-12">
+      <div class="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <p class="mt-2 text-gray-600">Loading subscription...</p>
+    </div>
+
+    <!-- Current Subscription -->
+    <div *ngIf="!loading && currentSubscription" class="bg-white rounded-lg shadow p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Current Subscription</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div>
+          <p class="text-sm text-gray-500">Plan</p>
+          <p class="text-lg font-semibold text-gray-900">{{ currentSubscription.plan | titlecase }}</p>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Status</p>
+          <span [class]="'px-2 py-1 text-xs font-medium rounded-full ' + (currentSubscription.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800')">
+            {{ currentSubscription.status | titlecase }}
+          </span>
+        </div>
+        <div>
+          <p class="text-sm text-gray-500">Expires At</p>
+          <p class="text-lg font-semibold text-gray-900">
+            {{ currentSubscription.expires_at ? (currentSubscription.expires_at | date) : 'Never' }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Available Features -->
+    <div *ngIf="!loading && features.length > 0" class="bg-white rounded-lg shadow p-6 mb-8">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Available Features</h2>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div *ngFor="let feature of features" class="border border-gray-200 rounded-lg p-4">
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="font-semibold text-gray-900">{{ feature.feature_name }}</h3>
+            <span *ngIf="feature.is_enabled" class="px-2 py-1 text-xs font-medium rounded-full bg-green-100 text-green-800">
+              Enabled
+            </span>
+            <span *ngIf="!feature.is_enabled" class="px-2 py-1 text-xs font-medium rounded-full bg-gray-100 text-gray-800">
+              Disabled
+            </span>
+          </div>
+          <p *ngIf="feature.description" class="text-sm text-gray-600 mb-2">{{ feature.description }}</p>
+          <p *ngIf="feature.limit_value" class="text-sm text-gray-500">
+            Limit: {{ feature.limit_value === null ? 'Unlimited' : feature.limit_value }}
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Plans Comparison -->
+    <div *ngIf="!loading" class="bg-white rounded-lg shadow p-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-6">Available Plans</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div *ngFor="let plan of plans" [class]="'border-2 rounded-lg p-6 ' + (isCurrentPlan(plan.key) ? 'border-indigo-500 bg-indigo-50' : 'border-gray-200')">
+          <div class="text-center mb-4">
+            <h3 class="text-2xl font-bold text-gray-900">{{ plan.name }}</h3>
+            <p class="text-3xl font-bold text-indigo-600 mt-2">
+              ${{ plan.price }}
+              <span class="text-sm text-gray-500 font-normal">/month</span>
+            </p>
+            <span *ngIf="isCurrentPlan(plan.key)" class="inline-block mt-2 px-3 py-1 text-xs font-medium rounded-full bg-indigo-100 text-indigo-800">
+              Current Plan
+            </span>
+          </div>
+
+          <ul class="space-y-2 mb-6">
+            <li *ngFor="let feature of plan.features" class="flex items-start">
+              <svg *ngIf="feature.is_enabled" class="h-5 w-5 text-green-500 mr-2" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm text-gray-700">{{ feature.feature_name }}</span>
+            </li>
+          </ul>
+
+          <div class="text-center">
+            <button
+              *ngIf="canUpgrade(plan.key)"
+              (click)="upgrade(plan.key as 'pro' | 'enterprise')"
+              [disabled]="upgrading"
+              class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
+            >
+              <span *ngIf="!upgrading">Upgrade</span>
+              <span *ngIf="upgrading">Upgrading...</span>
+            </button>
+            <button
+              *ngIf="canDowngrade(plan.key)"
+              (click)="downgrade(plan.key as 'basic' | 'pro')"
+              [disabled]="downgrading"
+              class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
+            >
+              <span *ngIf="!downgrading">Downgrade</span>
+              <span *ngIf="downgrading">Downgrading...</span>
+            </button>
+            <p *ngIf="isCurrentPlan(plan.key)" class="text-sm text-gray-500 mt-2">You are on this plan</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
