@@ -79,7 +79,8 @@ export class AuthService {
         }
         if (response.tenant) {
           this.currentTenantSubject.next(response.tenant);
-          localStorage.setItem('tenant_id', response.tenant.id);
+          // Store slug instead of UUID for tenant identification
+          localStorage.setItem('tenant_id', response.tenant.slug);
         }
       })
     );
@@ -116,7 +117,8 @@ export class AuthService {
 
   private setAuthData(response: AuthResponse): void {
     localStorage.setItem('auth_token', response.token);
-    localStorage.setItem('tenant_id', response.tenant.id);
+    // Store slug instead of UUID for tenant identification
+    localStorage.setItem('tenant_id', response.tenant.slug);
     this.currentUserSubject.next(response.user);
     this.currentTenantSubject.next(response.tenant);
   }

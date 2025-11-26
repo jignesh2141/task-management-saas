@@ -4,8 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SubscriptionController;
 use App\Http\Controllers\TaskController;
+use App\Http\Middleware\InitializeTenancyByRequestDataCustom;
 use Illuminate\Support\Facades\Route;
-use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,10 +21,11 @@ use Stancl\Tenancy\Middleware\InitializeTenancyByRequestData;
 // Public routes (no tenant required)
 Route::post('/auth/register', [AuthController::class, 'register']);
 
-// Routes that require tenant identification
-Route::middleware([InitializeTenancyByRequestData::class])->group(function () {
-    // Authentication routes
-    Route::post('/auth/login', [AuthController::class, 'login']);
+// Login route - handles tenant_id in request body, so no middleware needed
+Route::post('/auth/login', [AuthController::class, 'login']);
+
+// Routes that require tenant identification via middleware
+Route::middleware([InitializeTenancyByRequestDataCustom::class])->group(function () {
     Route::middleware('auth:sanctum')->group(function () {
         Route::post('/auth/logout', [AuthController::class, 'logout']);
         Route::get('/auth/me', [AuthController::class, 'me']);
