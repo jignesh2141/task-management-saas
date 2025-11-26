@@ -113,14 +113,14 @@
     <div *ngIf="!loading && totalPages > 1" class="mt-6 flex justify-center">
       <div class="flex space-x-2">
         <button
-          (click)="currentPage = 1; loadTasks()"
+          (click)="goToFirstPage()"
           [disabled]="currentPage === 1"
           class="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
         >
           First
         </button>
         <button
-          (click)="currentPage--; loadTasks()"
+          (click)="goToPreviousPage()"
           [disabled]="currentPage === 1"
           class="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
         >
@@ -130,14 +130,14 @@
           Page {{ currentPage }} of {{ totalPages }}
         </span>
         <button
-          (click)="currentPage++; loadTasks()"
+          (click)="goToNextPage()"
           [disabled]="currentPage === totalPages"
           class="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
         >
           Next
         </button>
         <button
-          (click)="currentPage = totalPages; loadTasks()"
+          (click)="goToLastPage()"
           [disabled]="currentPage === totalPages"
           class="px-3 py-2 border border-gray-300 rounded-md disabled:opacity-50"
         >

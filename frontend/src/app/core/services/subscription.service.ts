@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { ApiService } from './api.service';
 
 export interface Subscription {
@@ -39,7 +39,8 @@ export class SubscriptionService {
   constructor(private apiService: ApiService) { }
 
   getCurrentSubscription(): Observable<Subscription> {
-    return this.apiService.get<Subscription>('/subscription/current').pipe(
+    return this.apiService.get<{ subscription: Subscription }>('/subscription/current').pipe(
+      map(response => response.subscription),
       tap(subscription => {
         this.currentSubscriptionSubject.next(subscription);
       })

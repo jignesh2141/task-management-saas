@@ -15,7 +15,7 @@ export class TaskListComponent implements OnInit {
   totalPages: number = 1;
   statusFilter: string = '';
   searchQuery: string = '';
-  currentUser = this.authService.getCurrentUserValue();
+  currentUser: any = null;
 
   constructor(
     private tasksService: TasksService,
@@ -24,6 +24,7 @@ export class TaskListComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUserValue();
     this.loadTasks();
   }
 
@@ -103,5 +104,29 @@ export class TaskListComponent implements OnInit {
       'cancelled': 'bg-red-100 text-red-800'
     };
     return colors[status] || 'bg-gray-100 text-gray-800';
+  }
+
+  goToFirstPage(): void {
+    this.currentPage = 1;
+    this.loadTasks();
+  }
+
+  goToPreviousPage(): void {
+    if (this.currentPage > 1) {
+      this.currentPage--;
+      this.loadTasks();
+    }
+  }
+
+  goToNextPage(): void {
+    if (this.currentPage < this.totalPages) {
+      this.currentPage++;
+      this.loadTasks();
+    }
+  }
+
+  goToLastPage(): void {
+    this.currentPage = this.totalPages;
+    this.loadTasks();
   }
 }

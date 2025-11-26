@@ -8,7 +8,7 @@ import { AuthService } from '../../core/services/auth.service';
   styleUrls: ['./layout.component.css']
 })
 export class LayoutComponent implements OnInit {
-  currentUser = this.authService.getCurrentUserValue();
+  currentUser: any = null;
   currentUser$ = this.authService.currentUser$;
 
   constructor(
@@ -17,6 +17,7 @@ export class LayoutComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUserValue();
     this.authService.currentUser$.subscribe(user => {
       this.currentUser = user;
     });

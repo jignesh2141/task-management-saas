@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { SubscriptionService, Subscription, Plan, SubscriptionFeature } from '../../core/services/subscription.service';
+import { SubscriptionService, Subscription, Plan, SubscriptionFeature } from '../../../core/services/subscription.service';
 
 @Component({
   selector: 'app-subscription',
@@ -23,23 +23,27 @@ export class SubscriptionComponent implements OnInit {
 
   loadSubscription(): void {
     this.subscriptionService.getCurrentSubscription().subscribe({
-      next: (subscription) => {
+      next: (subscription: Subscription) => {
         this.currentSubscription = subscription;
         this.loadFeatures();
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading subscription:', error);
         this.loading = false;
+        // Handle 404 - no subscription found
+        if (error.status === 404) {
+          this.currentSubscription = null;
+        }
       }
     });
   }
 
   loadPlans(): void {
     this.subscriptionService.getPlans().subscribe({
-      next: (response) => {
+      next: (response: { plans: Plan[] }) => {
         this.plans = response.plans;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading plans:', error);
       }
     });
@@ -47,11 +51,11 @@ export class SubscriptionComponent implements OnInit {
 
   loadFeatures(): void {
     this.subscriptionService.getFeatures().subscribe({
-      next: (response) => {
+      next: (response: { plan: string; features: SubscriptionFeature[] }) => {
         this.features = response.features;
         this.loading = false;
       },
-      error: (error) => {
+      error: (error: any) => {
         console.error('Error loading features:', error);
         this.loading = false;
       }
@@ -66,7 +70,7 @@ export class SubscriptionComponent implements OnInit {
           this.loadSubscription();
           this.upgrading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error upgrading:', error);
           alert(error.error?.message || 'Failed to upgrade subscription');
           this.upgrading = false;
@@ -83,7 +87,7 @@ export class SubscriptionComponent implements OnInit {
           this.loadSubscription();
           this.downgrading = false;
         },
-        error: (error) => {
+        error: (error: any) => {
           console.error('Error downgrading:', error);
           alert(error.error?.message || 'Failed to downgrade subscription');
           this.downgrading = false;
@@ -110,5 +114,17 @@ export class SubscriptionComponent implements OnInit {
 
   isCurrentPlan(planKey: string): boolean {
     return this.currentSubscription?.plan === planKey;
+  }
+
+  upgradePlan(planKey: string): void {
+    if (planKey === 'pro' || planKey === 'enterprise') {
+      this.upgrade(planKey as 'pro' | 'enterprise');
+    }
+  }
+
+  downgradePlan(planKey: string): void {
+    if (planKey === 'basic' || planKey === 'pro') {
+      this.downgrade(planKey as 'basic' | 'pro');
+    }
   }
 }

@@ -81,7 +81,7 @@
           <div class="text-center">
             <button
               *ngIf="canUpgrade(plan.key)"
-              (click)="upgrade(plan.key as 'pro' | 'enterprise')"
+              (click)="upgradePlan(plan.key)"
               [disabled]="upgrading"
               class="w-full px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 disabled:opacity-50"
             >
@@ -90,7 +90,7 @@
             </button>
             <button
               *ngIf="canDowngrade(plan.key)"
-              (click)="downgrade(plan.key as 'basic' | 'pro')"
+              (click)="downgradePlan(plan.key)"
               [disabled]="downgrading"
               class="w-full px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 disabled:opacity-50"
             >

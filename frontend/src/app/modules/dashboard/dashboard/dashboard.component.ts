@@ -11,7 +11,7 @@ export class DashboardComponent implements OnInit {
   widgets: DashboardWidget[] = [];
   stats: DashboardStats['stats'] = {};
   loading: boolean = true;
-  currentUser = this.authService.getCurrentUserValue();
+  currentUser: any = null;
 
   constructor(
     private dashboardService: DashboardService,
@@ -19,6 +19,7 @@ export class DashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.currentUser = this.authService.getCurrentUserValue();
     this.loadDashboard();
   }
 
